@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import render_template, url_for, request
 from flask_talisman import Talisman
 from flask_seasurf import SeaSurf
 from flask_cors import CORS
@@ -13,4 +14,4 @@ app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
 
 @app.route("/")
 def index():
-    return "Hello Newfoundland!"
+    return render_template("index.html", strava_auth="")
