@@ -3,3 +3,4 @@ flask-talisman
 flask-cors
 flask-seasurf
 requests
+gunicorn
