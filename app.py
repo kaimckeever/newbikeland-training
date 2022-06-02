@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template, url_for, request
+from flask import render_template
 from flask_talisman import Talisman
 from flask_seasurf import SeaSurf
 from flask_cors import CORS
