@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="robots" content="noindex">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="{{ flask.url_for('static', filename='favicon.ico') }}">
+</head>
+
+<body class="bg-white dark:bg-slate-800">
+    <div>{% block content %}
+        {% endblock %}</div>
+</body>
+
+</html>
