@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {% extends 'base.html' %}
-{% block title %} Newbikeland Training {% endblock %}
+{% block title %}Newbikeland Training{% endblock %}
 {% block content %}
 <div class="text-center pt-6 sm:text-left sm:p-32">
     <div class="text-slate-900 dark:text-white">
@@ -11,7 +11,7 @@
         <b class="text-lg">Now there's one less excuse for an sparse training log.</b>
     </div>
     <br>
-    <a href="/"
+    <a href="{{ strava_auth_url }}"
         class="px-6 py-2 text-orange-600 font-semibold rounded-full border border-orange-200 hover:text-white hover:bg-orange-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2">
         Log in with Strava
     </a>

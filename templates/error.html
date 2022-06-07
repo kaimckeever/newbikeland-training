@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% block title %}Error{% endblock %}
+{% block content %}
+<br>
+<div class="mx-auto px-4 pt-6">
+    <div class="text-slate-900 dark:text-white">
+        <h1 class="text-center text-2xl">Someone done messed up.</h1>
+        <p class="text-center">{{ error }}</p>
+        <br>
+        <img src="static/404.gif" class="img-responsive center-block mx-auto d-block"
+            alt="&quot;You done messed up, A-a-ron!&quot; from Key and Peele">
+    </div>
+</div>
+{% endblock %}
