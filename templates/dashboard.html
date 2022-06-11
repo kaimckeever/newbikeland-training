@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% block title %}Newbikeland Training{% endblock %}
+{% block content %}
+<div class="text-center pt-6 sm:text-left sm:p-32">
+    <div class="text-slate-900 dark:text-white">
+        <h1 class="text-xl">Howdy howdy howdy, {{user_name}}</h1>
+        <b class="text-lg">You now have one less excuse for an sparse training log.</b>
+    </div>
+    <br>
+    <div class="my-5">
+        <a href="{{url_for('sync')}}"
+            class="px-6 py-2 text-orange-600 font-semibold rounded-full border border-orange-200 hover:text-white hover:bg-orange-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2">
+            Start syncing your workouts
+        </a>
+    </div>
+    <div class="my-5">
+        <a href="{{url_for('add')}}"
+            class="px-6 py-2 text-orange-600 font-semibold rounded-full border border-orange-200 hover:text-white hover:bg-orange-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2">
+            Add workouts manually to Airtable
+        </a>
+    </div>
+    <div class="my-5"><a href="{{url_for('logout')}}"
+            class="px-6 py-2 text-orange-600 font-semibold rounded-full border border-orange-200 hover:text-white hover:bg-orange-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2">
+            Logout
+        </a>
+    </div>
+    <br>
+    <div class="text-slate-900 dark:text-white">
+        <em class="text-xs">Backend is currently in development. This page and its functionality will change.</em>
+    </div>
+</div>
+
+{% endblock %}

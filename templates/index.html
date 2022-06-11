@@ -4,14 +4,14 @@
 {% block content %}
 <div class="text-center pt-6 sm:text-left sm:p-32">
     <div class="text-slate-900 dark:text-white">
-        <h1 class="text-xl">Hey Newbikelander, get connected to Strava.</h1>
+        <h1 class="text-xl">👋 Hey Newbikelander, get connected to Strava.</h1>
         <p>Connecting to Strava will automatically display rides/workouts you do in the training
             log in Airtable.
         </p>
         <b class="text-lg">Now there's one less excuse for an sparse training log.</b>
     </div>
     <br>
-    <a href="{{ strava_auth_url }}"
+    <a href="{{url_for('authorize')}}"
         class="px-6 py-2 text-orange-600 font-semibold rounded-full border border-orange-200 hover:text-white hover:bg-orange-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2">
         Log in with Strava
     </a>
