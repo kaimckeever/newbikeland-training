@@ -71,6 +71,7 @@ def exchange_token():
     response.set_cookie("expires_at", expires_at)
     response.set_cookie("accepted_scopes", accepted_scopes)
     response.set_cookie("user_name", user_name)
+    response.set_cookie("user_id", user_id)
     flash("You were successfully logged in")
     return response
 
@@ -110,15 +111,15 @@ def webhook():
         app.logger.info("webhook received")
         data = request.get_json()
         return make_response(jsonify(data), 200)
-    else:
-        mode = request.args.get("hub.mode")
-        challenge = request.args.get("hub.challenge")
-        token = request.args.get("hub.verify_token")
-        if mode and token:
-            if mode != "subscribe" or token != VERIFY_TOKEN:
-                return make_response("", 403)
-            app.logger.info("WEBHOOK_VERIFIED")
-            return make_response(jsonify({"hub.challenge": challenge}), 200)
+    mode = request.args.get("hub.mode")
+    challenge = request.args.get("hub.challenge")
+    token = request.args.get("hub.verify_token")
+    if mode and token:
+        if mode != "subscribe" or token != VERIFY_TOKEN:
+            return make_response("", 403)
+        app.logger.info("WEBHOOK_VERIFIED")
+        return make_response(jsonify({"hub.challenge": challenge}), 200)
+    return make_response("", 403)
 
 
 @app.route("/add")
@@ -138,6 +139,7 @@ def logout():
     response.set_cookie("refresh_token", expires=0)
     response.set_cookie("expires_at", expires=0)
     response.set_cookie("user_name", expires=0)
+    response.set_cookie("user_id", expires=0)
     flash("You were successfully logged out")
     return response
 
@@ -147,7 +149,7 @@ def page_not_found(e):
     return render_template(
         "error.html",
         who="You",
-        error="Error 404: Page not found. You are looking for a page that doesn't exist.",
+        error="Error 404: Page not found.",
     )
 
 
