@@ -12,6 +12,8 @@ from flask import (
 from flask_talisman import Talisman
 from flask_seasurf import SeaSurf
 from deta import Deta
+
+# from pyairtable import Table
 import os
 import requests
 
@@ -25,9 +27,13 @@ CLIENT_ID = os.environ.get("CLIENT_ID")
 PRODUCTION_URL = os.environ.get("PRODUCTION_URL")
 FLASK_ENV = os.environ.get("FLASK_ENV")
 CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
+# AIRTABLE_API_KEY = os.environ["AIRTABLE_API_KEY"]
+# BASE_ID = os.environ["BASE_ID"]
+# TABLE = Table(AIRTABLE_API_KEY, BASE_ID, "Training Log")
 if PROJECT_KEY := os.environ.get("PROJECT_KEY") or None:
     deta = Deta(PROJECT_KEY)
-    users = deta.Base("users")
+    access_tokens_db = deta.Base("access_tokens")
+    refresh_tokens_db = deta.Base("refresh_tokens")
 
 
 @app.route("/")
@@ -48,22 +54,10 @@ def authorize():
 def exchange_token():
     if error := request.args.get("error") or None:
         return render_template("error.html", error=error)
-
+    response_json = {}
+    refresh_token = ""
     url = "https://www.strava.com/api/v3/oauth/token"
-    if (
-        request.cookies.get("expires_at") is not None
-        and request.cookies.get("expires_at") < time()
-        and request.cookies.get("refresh_token") is not None
-    ):
-        access_token_params = {
-            "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET,
-            "grant_type": "refresh_token",
-            "refresh_token": request.cookies.get("refresh_token"),
-        }
-        access_token_response = requests.post(url, params=access_token_params)
-        response_json = access_token_response.json()
-    else:
+    if "refresh_token" not in request.cookies:
         code = request.args.get("code")
         exchange_token_params = {
             "client_id": CLIENT_ID,
@@ -71,28 +65,30 @@ def exchange_token():
             "code": code,
             "grant_type": "authorization_code",
         }
-        exchange_token_response = requests.post(url, params=exchange_token_params)
-        response_json = exchange_token_response.json()
-    app.logger.info(response_json)
-    return set_cookies(response_json)
-
-
-def set_cookies(response_json):
-    access_token = response_json["access_token"]
-    refresh_token = response_json["refresh_token"]
-    expires_at = response_json["expires_at"]
-    accepted_scopes = response_json["scope"]
-    user_id = response_json["athlete"]["id"]
-    user_name = response_json["athlete"]["firstname"]
+        auth_code_response = requests.post(url, params=exchange_token_params)
+        response_json = auth_code_response.json()
+        app.logger.error(response_json)
+        refresh_token = response_json["refresh_token"]
+    refresh_grant_params = {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+    }
+    refresh_grant_response = requests.post(url, params=refresh_grant_params)
+    response_json = refresh_grant_response.json()
+    app.logger.error(response_json)
     response = redirect(url_for("dashboard"))
-    response.set_cookie("refresh_token", refresh_token)
-    response.set_cookie("access_token", access_token)
-    response.set_cookie("expires_at", expires_at)
-    response.set_cookie("accepted_scopes", accepted_scopes)
-    response.set_cookie("user_name", user_name)
-    response.set_cookie("user_id", user_id)
     flash("You were successfully logged in")
     return response
+
+
+def put_access_token(athlete_id, scope, access_token, expires_at):
+    pass
+
+
+def put_refresh_token(athlete_id, scope, refresh_token):
+    pass
 
 
 @app.route("/dashboard")
