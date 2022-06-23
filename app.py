@@ -1,3 +1,4 @@
+from time import time
 from flask import Flask
 from flask import (
     render_template,
@@ -13,6 +14,7 @@ from flask_seasurf import SeaSurf
 from deta import Deta
 import os
 import requests
+
 
 app = Flask(__name__)
 Talisman(app)
@@ -44,27 +46,44 @@ def authorize():
 
 @app.route("/exchange_token")
 def exchange_token():
-    code = request.args.get("code")
     if error := request.args.get("error") or None:
         return render_template("error.html", error=error)
-    exchange_token_url = "https://www.strava.com/oauth/token"
-    exchange_token_params = {
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-        "code": code,
-        "grant_type": "authorization_code",
-    }
-    exchange_token_response = requests.post(
-        exchange_token_url, params=exchange_token_params
-    )
-    response_json = exchange_token_response.json()
+
+    url = "https://www.strava.com/api/v3/oauth/token"
+    if (
+        request.cookies.get("expires_at") is not None
+        and request.cookies.get("expires_at") < time()
+        and request.cookies.get("refresh_token") is not None
+    ):
+        access_token_params = {
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "grant_type": "refresh_token",
+            "refresh_token": request.cookies.get("refresh_token"),
+        }
+        access_token_response = requests.post(url, params=access_token_params)
+        response_json = access_token_response.json()
+    else:
+        code = request.args.get("code")
+        exchange_token_params = {
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "code": code,
+            "grant_type": "authorization_code",
+        }
+        exchange_token_response = requests.post(url, params=exchange_token_params)
+        response_json = exchange_token_response.json()
+    app.logger.info(response_json)
+    return set_cookies(response_json)
+
+
+def set_cookies(response_json):
     access_token = response_json["access_token"]
     refresh_token = response_json["refresh_token"]
     expires_at = response_json["expires_at"]
     accepted_scopes = response_json["scope"]
     user_id = response_json["athlete"]["id"]
     user_name = response_json["athlete"]["firstname"]
-
     response = redirect(url_for("dashboard"))
     response.set_cookie("refresh_token", refresh_token)
     response.set_cookie("access_token", access_token)
@@ -96,6 +115,7 @@ def sync():
         "client_secret": CLIENT_SECRET,
         "callback_url": callback_url,
         "verify_token": VERIFY_TOKEN,
+        "access_token": request.cookies.get("access_token"),  # TODO check on this later
     }
     push_subscription_response = requests.post(
         push_subscription_url, params=push_subscription_params
